@@ -1,12 +1,11 @@
 import React from "react";
-import { Sparkles, History, Plus, Dices, Smartphone } from "lucide-react";
+import { Sparkles, History, Plus, Dices } from "lucide-react";
 
 interface HeaderProps {
   onNewDecision: () => void;
   onOpenTemplates: () => void;
   onOpenHistory: () => void;
   onOpenRandomizer?: () => void;
-  onOpenInstallModal?: () => void;
   historyCount: number;
   hasActiveAnalysis: boolean;
 }
@@ -16,7 +15,6 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenTemplates,
   onOpenHistory,
   onOpenRandomizer,
-  onOpenInstallModal,
   historyCount,
   hasActiveAnalysis,
 }) => {
@@ -43,18 +41,6 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Action Controls */}
       <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
-        {onOpenInstallModal && (
-          <button
-            id="btn-android-install"
-            onClick={onOpenInstallModal}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-md transition-colors cursor-pointer shadow-xs"
-            title="Install App on Android phone / Download"
-          >
-            <Smartphone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 shrink-0" />
-            <span className="hidden md:inline">Android App</span>
-            <span className="md:hidden">App</span>
-          </button>
-        )}
 
         {onOpenRandomizer && (
           <button

@@ -32,11 +32,11 @@ function getAIClient(): GoogleGenAI {
 }
 
 const CANDIDATE_MODELS = [
-  "gemini-3.5-flash",
-  "gemini-3.1-pro-preview",
-  "gemini-3.1-flash-lite",
   "gemini-3.7-flash",
+  "gemini-3.5-flash",
   "gemini-flash-latest",
+  "gemini-3.1-flash-lite",
+  "gemini-3.1-pro-preview",
 ];
 
 export interface GroundingSource {
@@ -88,18 +88,18 @@ async function generateWithRetryAndFallback(params: {
   const ai = getAIClient();
 
   // Model selection hierarchy based on intent:
-  // - High thinking: gemini-3.1-pro-preview with ThinkingLevel.HIGH
-  // - Search grounding: gemini-3.5-flash with googleSearch tool
+  // - High thinking: gemini-3.7-flash with thinking or gemini-3.1-pro-preview
+  // - Search grounding: gemini-3.7-flash with googleSearch tool
   // - Fast tasks: gemini-3.1-flash-lite for low latency
-  // - General tasks: gemini-3.5-flash
+  // - General tasks: gemini-3.7-flash
   let preferred = params.preferredModel;
   if (!preferred) {
     if (params.highThinking) {
-      preferred = "gemini-3.1-pro-preview";
+      preferred = "gemini-3.7-flash";
     } else if (params.enableSearchGrounding) {
-      preferred = "gemini-3.5-flash";
+      preferred = "gemini-3.7-flash";
     } else {
-      preferred = "gemini-3.5-flash";
+      preferred = "gemini-3.7-flash";
     }
   }
 
