@@ -6,9 +6,10 @@ import { HistoryDrawer } from "./components/HistoryDrawer";
 import { TemplatesModal } from "./components/TemplatesModal";
 import { RandomDecisionModal } from "./components/RandomDecisionModal";
 import { GeminiChatModal } from "./components/GeminiChatModal";
+import { AndroidInstallModal } from "./components/AndroidInstallModal";
 import { PRESET_TEMPLATES } from "./data/templates";
 import { DecisionSession, PresetTemplate, DecisionOption, DecisionAnalysisResult } from "./types";
-import { Sparkles, Scale, AlertTriangle, Bot } from "lucide-react";
+import { Sparkles, Scale, AlertTriangle, Bot, Smartphone, Download, X } from "lucide-react";
 
 const STORAGE_KEY = "the_tiebreaker_history_v1";
 
@@ -30,7 +31,36 @@ export default function App() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isRandomizerOpen, setIsRandomizerOpen] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showMobileInstallBanner, setShowMobileInstallBanner] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
+
+  // Listen for PWA beforeinstallprompt event on Android devices
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      // Show subtle banner on mobile
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        setShowMobileInstallBanner(true);
+      }
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    // Also show install option on Android browsers if not standalone
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    if (isAndroid && !isStandalone) {
+      setShowMobileInstallBanner(true);
+    }
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    };
+  }, []);
 
   // Load history from localStorage
   useEffect(() => {
@@ -164,12 +194,42 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] text-slate-900 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
+      {/* Mobile Android PWA Quick Install Banner */}
+      {showMobileInstallBanner && (
+        <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white px-3.5 py-2 text-xs flex items-center justify-between gap-2 shadow-xs z-30">
+          <div className="flex items-center gap-2 min-w-0">
+            <Smartphone className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span className="truncate">
+              <strong>Get Android App:</strong> Install on your home screen
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsInstallModalOpen(true)}
+              className="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-md text-[11px] transition-colors cursor-pointer"
+            >
+              Install
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowMobileInstallBanner(false)}
+              className="p-1 text-slate-300 hover:text-white transition-colors cursor-pointer"
+              title="Dismiss"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Top Header */}
       <Header
         onNewDecision={handleNewDecision}
         onOpenTemplates={() => setIsTemplatesOpen(true)}
         onOpenHistory={() => setIsHistoryOpen(true)}
         onOpenRandomizer={() => setIsRandomizerOpen(true)}
+        onOpenInstallModal={() => setIsInstallModalOpen(true)}
         historyCount={history.length}
         hasActiveAnalysis={!!currentSession?.analysis}
       />
@@ -314,6 +374,17 @@ export default function App() {
         onClose={() => setIsRandomizerOpen(false)}
         options={currentSession?.options}
         decisionTitle={currentSession?.title}
+      />
+
+      {/* Android PWA Install & Code Download Modal */}
+      <AndroidInstallModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+        deferredPrompt={deferredPrompt}
+        onInstallSuccess={() => {
+          setShowMobileInstallBanner(false);
+          setIsInstallModalOpen(false);
+        }}
       />
     </div>
   );

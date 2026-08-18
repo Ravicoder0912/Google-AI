@@ -1,0 +1,29 @@
+{
+  "name": "The Tiebreaker — AI Decision Assistant",
+  "short_name": "Tiebreaker",
+  "description": "Break decision paralysis with structured AI analysis, pros & cons, and tiebreaker verdicts on your Android device.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F9FAFB",
+  "theme_color": "#4F46E5",
+  "categories": ["productivity", "utilities", "business"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Decision",
+      "short_name": "New",
+      "description": "Start analyzing a new dilemma",
+      "url": "/",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    }
+  ]
+}
